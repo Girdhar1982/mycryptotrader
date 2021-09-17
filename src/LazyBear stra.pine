@@ -1,0 +1,27 @@
+// © dgtrd
+// @author LazyBear
+
+//@version=4
+
+study(title="WaveTrend [LazyBear] vX by DGT", shorttitle="WT_LB_vX", overlay=true)
+n1 = input(10, "Channel Length")
+n2 = input(21, "Average Length")
+threshold   = input(55 , "Threshold Level")
+v_show_last = input(233, "Plotting Lookback Bars Length")
+
+ap  = hlc3 
+esa = ema(ap, n1)
+d   = ema(abs(ap - esa), n1)
+ci  = (ap - esa) / (0.015 * d)
+tci = ema(ci, n2)
+ 
+wt1 = tci
+wt2 = sma(wt1,4)
+
+plotshape(crossover(wt1, wt2)  and wt1 < -threshold, title="Strong Long" , color=#006400    , style=shape.labelup  , location=location.belowbar, size=size.small, show_last = v_show_last) //, text="↑", textcolor=color.white)
+plotshape(crossover(wt1, wt2)  and wt1 > -threshold, title="Long"        , color=color.green, style=shape.labelup  , location=location.belowbar, size=size.tiny , show_last = v_show_last)
+
+plotshape(crossunder(wt1, wt2) and wt1 > threshold , title="Strong Short", color=#910000    , style=shape.labeldown, location=location.abovebar, size=size.small, show_last = v_show_last) //, text="↓", textcolor=color.white)
+plotshape(crossunder(wt1, wt2) and wt1 < threshold , title="Short"       , color=color.red  , style=shape.labeldown, location=location.abovebar, size=size.tiny , show_last = v_show_last)
+
+alertcondition(cross(wt1, wt2), title="Trading Opportunity", message="Probable Trade Opportunity\n{{exchange}}:{{ticker}}->\nPrice = {{close}},\nTime = {{time}}")
